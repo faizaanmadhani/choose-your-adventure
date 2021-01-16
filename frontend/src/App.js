@@ -1,9 +1,7 @@
-import './App.css';
 import { Switch, Route } from 'react-router-dom';
-import VisitorView from './component/visitor/VisitorView'
+import VisitorView from './component/visitor/VisitorView';
 import writerPage from './component/writer/writerPage';
 import ReaderView from './component/reader/ReaderView.jsx';
-
 
 /*
 Pages:

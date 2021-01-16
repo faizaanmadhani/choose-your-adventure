@@ -9,7 +9,7 @@ body {
     height: 100%;
 }
 //page scss
-.flowContainer {
+.flowWrapper {
     margin-left: 5rem;
     height: 100vh;
     //border-style: dashed;
@@ -31,7 +31,7 @@ body {
     position: fixed;
     right: 5rem;
     top: 5rem;
-    z-index: 3;
+    z-index: 10;
 }
 .pageContainer {
     height: 100vh;
