@@ -93,7 +93,11 @@ function ReaderView() {
                         <h2 style={{margin: 'auto'}} className={classes.storyTitle} >Story Title</h2>
                     </Grid>
                     <Grid className={classes.grid} container item sm={2}>
-                        <IconButton style={{margin: 'auto'}} aria-label="home" color="primary">
+						<IconButton style={{margin: 'auto'}} aria-label="home" color="primary"  
+							onClick={(e) => {
+                            e.preventDefault();
+                            window.location.href='/';
+                            }} >
                             <img className={classes.homeIcon} style={{margin: 'auto'}} src={homeIcon} alt='home' height='25px' width='25px'/>
                         </IconButton>
                     </Grid>
