@@ -1,0 +1,45 @@
+//remove white space at top and bottom when scrolling
+html {
+    overflow: hidden;
+    height: 100%;
+}
+
+body {
+    overflow: auto;
+    height: 100%;
+}
+//page scss
+.flowContainer {
+    margin-left: 5rem;
+    height: 100vh;
+    //border-style: dashed;
+}
+.sideBarContainer {
+    top: 0;
+    left: 0;
+    width: 5rem;
+    height: 100%;
+
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+
+    //border-style: solid;
+}
+.share {
+    position: fixed;
+    right: 5rem;
+    top: 5rem;
+    z-index: 3;
+}
+.pageContainer {
+    height: 100vh;
+    width: 100vw;
+    display: inline-block;
+    background: linear-gradient(
+        to right,
+        #74ebd5,
+        #acb6e5
+    ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
