@@ -110,10 +110,12 @@ class WriterView extends Component {
 						elements={this.state.nodes}
 						onConnect={this.handleConnect}
 						onElementsRemove={this.handleDelete}
-						onElementClick={() => {}}
+						onElementClick={(e, node) => {
+							this.setState({ nodeView: node.id });
+						}}
 					/>
 				) : (
-					<div> zoomed in </div>
+					<div> {this.state.nodeView} </div>
 				)}
 			</div>
 		);
