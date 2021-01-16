@@ -2,7 +2,11 @@ const express = require('express')
 const app = express()
 const port = 3000
 const SERVER_STARTED = 'Server started on port: '
-const db = admin.firestore();
+
+const db = new Firestore({
+    projectId: 'adventure-story-301904',
+    keyFilename: 'adventure-story-301904-a988dcece07e.json',
+});
 
 /* app.get('/', (req, res) => {
     res.send("Hello, World");
@@ -20,14 +24,10 @@ async function removePage(db){
         capital: FieldValue.delete()
     });
     console.log('Update: ', res);
-}
+} 
 
-function removeChildren(page1, page2){ 
-    for (i = 0; i < page2.children.length; i++){
-        if(page2.children[i] == page1){
-            page2.splice(i, 1);
-        }
-    }
+async function unConnect (db){
+    const messageRef = db.collection('stories').doc('ts1') .remove('config');
 }
 
 async function addPage(db){
@@ -38,7 +38,6 @@ async function addPage(db){
     console.log('Add: ', res);
 } 
 
-function connectPages(page1, page2){
-    page1.addChildren(page2);
-    page2.addChildren(page1);
+async function connectPage(db){
+    const messageRef = db.collection('stories').doc('ts1') .collection('config');
 }
