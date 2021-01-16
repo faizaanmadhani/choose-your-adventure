@@ -51,13 +51,14 @@ const useStyles = makeStyles({
 	}
 });
 
-//API call + parse array of children nodes
+//AXIOS: on page load, send a get request for ALL nodes and store it.
 function fetchNodes () {
 	//Temporary
 	return ['some chooooiiiiice node1', 'some choiiiiice node2', 'some choiiiiccce node3']
 }
 
 //map helper function
+//AXIOS: the onclick event fires a get request for the next page. 
 function processNode (node) {
 	return (
 		<Button style={{
@@ -69,7 +70,7 @@ function processNode (node) {
 			fontWeight: '600',
 			color: '#ffffff',
 			fontSize: '1.05em'
-		}} onClick={() => alert('do something')}>
+		}} onClick={() => alert('do something')}> 
 			{node}
 		</Button>
 	);
