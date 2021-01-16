@@ -76,6 +76,7 @@ function processNode (node) {
 	);
 }
 
+//AXIOS: get request for story content 
 function ReaderView() {
 	const classes = useStyles();
 	let nodes = fetchNodes();
@@ -98,8 +99,8 @@ function ReaderView() {
                     </Grid>
                 </Grid> 
                 <Grid className={classes.mainContentWrapper} container item sm={12} spacing={0}>
-					<Container maxWidth="lg">
-						<h1 className={classes.chapterTitle}>Chapter $(Depth+1)</h1>
+					<Container style={{paddingBottom: '2rem'}} className={classes.grid} maxWidth="lg">
+						<h1 className={classes.chapterTitle} style={{margin: 'auto'}}>Chapter $(Depth+1)</h1>
 					</Container>
 					
 					<Container className={classes.mainContent} maxWidth="lg">
