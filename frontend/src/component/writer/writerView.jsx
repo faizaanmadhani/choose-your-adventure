@@ -2,16 +2,28 @@ import { react } from '@babel/types';
 import React, { Component } from 'react';
 import ReactFlow, { addEdge, removeElements } from 'react-flow-renderer';
 import http from '../../services/httpservice';
+import PageDetail from './pageDetail';
 class WriterView extends Component {
 	state = {
 		nodes: [],
 		title: '',
-		parentId: 0,
+		storyID: 0,
 		instanceWrap: React.createRef(),
 		instance: {},
-		nodeView: -1 //if -1, we are on overview, if on anything else, we are on the nodeview
+		nodeView: -1, //if -1, we are on overview, if on anything else, we are on the nodeview,
+		nodeViewValue: ''
+	};
+	handleNodeViewValueChange = (param) => {
+		this.setState({ nodeViewValue: param });
+	};
+	handleTitleChange = (param) => {
+		this.setState({ title: param.target.value });
 	};
 	componentDidMount() {
+		/*
+		const {arrayBody} = http.get('url' and storyid);
+		const nodes = arrayBody.filter(()=>{}) //filtr out the config doc
+		*/
 		this.setState({
 			//set title and set parentid!//!
 			// later to be replaced from backend
@@ -52,9 +64,9 @@ class WriterView extends Component {
 			]
 		});
 	}
-	update = () => {
-		//! send signal with http
-		//const data = make some data to send back
+	updateStory = (obj) => {
+		//! const res = http.post('url', obj);
+		console.log(obj);
 	};
 	handleConnect = (param) => {
 		//target is parent, source is child
@@ -67,6 +79,7 @@ class WriterView extends Component {
 		this.setState({ nodes });
 	};
 	handleDelete = (param) => {
+		//remove if its not parent
 		if (param[0].id != 1) {
 			//! or whereever the things start{}
 			const nodes = removeElements(param, this.state.nodes);
@@ -77,6 +90,7 @@ class WriterView extends Component {
 		this.setState({ instance: param }); //set state instance
 	};
 	handleNew = () => {
+		//make new node
 		const height = this.state.instanceWrap.current.clientHeight;
 		const width = this.state.instanceWrap.current.clientWidth * 0.7;
 		const instanceObject = this.state.instance.toObject().position;
@@ -102,9 +116,11 @@ class WriterView extends Component {
 						onNodeDragStop={(p1, p2) => {
 							console.log(p1);
 							console.log(p2);
+							//! storyupdate here!
 						}}
 						onMoveEnd={(param) => {
 							console.log(`window zoom: ${param.zoom}, position: x: ${param.x}, y: ${param.y}`);
+							//!storyupdate here!
 						}}
 						onLoad={this.handleLoad}
 						elements={this.state.nodes}
@@ -115,7 +131,17 @@ class WriterView extends Component {
 						}}
 					/>
 				) : (
-					<div> {this.state.nodeView} </div>
+					<PageDetail
+						nodeId={this.state.nodeView}
+						value={this.state.nodeViewValue}
+						setValue={this.handleNodeViewValueChange}
+						title={this.state.title}
+						setTitle={this.handleTitleChange}
+						moveBack={() => {
+							this.setState({ nodeView: -1 });
+						}}
+						// doSave={}
+					/>
 				)}
 			</div>
 		);
