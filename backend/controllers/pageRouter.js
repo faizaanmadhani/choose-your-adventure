@@ -34,10 +34,19 @@ pageRouter.get('/', async (req, res) => {
     var collectionIDs = [];
 
     const documentRef = db.collection('data').doc('stories')
-    documentRef.listCollections().then(collections => {
+    documentRef.listCollections().then(async (collections) => {
         for (let collection of collections) {
+            
+            const configRef = await collection.doc('config').get()
+            if (!configRef.exists) {
+                res.status(500).send({msg: "Story does not have config node"})
+                return
+            }
+
           collectionIDs.push({
-            "id" : collection.id
+                "id" : collection.id,
+                "title": configRef.data().title,
+                "author" : configRef.data().author
             })
         }
         res.status(200).send({stories: collectionIDs})
@@ -52,6 +61,7 @@ pageRouter.post('/create', async (req, res) => {
     const titleID = genTitleHash()
 
     try {
+        // Add collection for story and associated config file
         const ref = await storiesReference.collection(titleID).add({
             'choice': '',
             position: {
@@ -62,6 +72,7 @@ pageRouter.post('/create', async (req, res) => {
             links: [],
             })
 
+            // Add the default first node
             const docRef = await storiesReference.collection(titleID).doc('config').set({
                 title: req.body.title,
                 author: req.body.author,
@@ -270,12 +281,11 @@ pageRouter.post('/delete/:title/:docID', async (req, res) => {
         // Iterate through nodes and find and delete the reference
         const storyPages = await storiesReference.collection(title).get()
         storyPages.docs.forEach(async (node) => {
-            if (node.links !== undefined) {
-                if (node.links.includes(docID)) {
-                    const removeLinkRes = await storiesReference.collection(title).doc(node.id).update({
-                        links: firebase.firestore.FieldValue.arrayRemove(docID)
-                    })
-                }
+            console.log(node.id)
+            if (node.data().links !== undefined) {
+                const removeLinkRes = await storiesReference.collection(title).doc(node.id).update({
+                    links: admin.firestore.FieldValue.arrayRemove(docID)
+                })
             }
         })
 
