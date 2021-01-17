@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react'
-import { Grid } from '@material-ui/core'
+import { FormHelperText, Grid } from '@material-ui/core'
 import { IconButton } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { Container } from '@material-ui/core'
 import { Button } from '@material-ui/core'
 import InputBase from '@material-ui/core/InputBase';
+import Divider from '@material-ui/core/Divider'
+import Fab from '@material-ui/core/Fab';
+import AddIcon from '@material-ui/icons/Add'
 
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
@@ -62,7 +65,27 @@ const useStyles = makeStyles((theme) => ({
  },
  storiesWrapper: {
     display: 'flex',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    paddingBottom: '100px',
+    margin: '0'
+ },
+ subHeaderWrapper: {
+     textAlign: 'center'
+ },
+ subHeader : {
+     margin: 'auto',
+     fontFamily: 'Nunito, sans-serif',
+     fontSize: '2.5rem',
+     paddingBottom: '1rem',
+     paddingTop: '1rem',
+     color:'#ffffff'
+ },
+ addButton: {
+    width: '60px',
+    height: '60px',
+    position: 'absolute',
+    bottom: '30px',
+    right: '30px'
  }
 }));
 
@@ -79,14 +102,15 @@ function fetchTestStories () {
 
 function mapStory (story) {
 	return (
-        <ProcessStory id={story.id} author={story.author}></ProcessStory>
+        <ProcessStory id={story.id} author={story.author} title={story.title}></ProcessStory>
     );
 }
 
 function VisitorView() {
     //test endpoints:
     //getStories();
-    const [ids, setIds] = useState(null); //
+    const [ids, setIds] = useState([]); //
+    //const [jsxStories, setJsxStories] = useState('');
     
     const classes = useStyles(); //styles
     
@@ -101,9 +125,15 @@ function VisitorView() {
         getIds();
     }, []);
     
+    console.log('Ids')
     console.log(ids); //setStories is working.
-    let stories = fetchTestStories();
-    let jsxStories = stories.map(mapStory);
+    let jsxStories = ids.map(mapStory);
+
+    //let stories = fetchTestStories();
+    //let jsxStories = stories.map(mapStory);
+    /* static test data
+    
+    */
     
     /*
     useEffect(() => {
@@ -114,7 +144,7 @@ function VisitorView() {
     
     return (
         <Grid>
-            <Grid style={{backgroundColor: '#292c2e' }}container spacing={0}>
+            <Grid style={{backgroundColor: '#292c2e', paddingBottom:'25px'}}container spacing={0}>
 
             {/* Logo */}
             <Container className={classes.logoWrapper} maxWidth='lg'>
@@ -130,15 +160,19 @@ function VisitorView() {
             </Container>
             </Grid>
             <Grid style={{backgroundColor: '#3a3c45'}} container spacing={0}>
+                <Grid className={classes.subHeaderWrapper} container maxWidth='md'>
+                    <div className={classes.subHeader}>Stories</div>
+                </Grid>
                 <GridList className={classes.storiesWrapper}>
-                    <GridListTile key="Subheader" cols={3} style={{ height: 'auto'}}>
-                        <ListSubheader component="div">Stories</ListSubheader>
-                    </GridListTile>
                     {jsxStories}
                 </GridList>
-
             </Grid>
+            <Fab color="primary" aria-label="add" className={classes.addButton}>
+                <AddIcon />
+            </Fab>
         </Grid>
+
+        
     )
 }
 

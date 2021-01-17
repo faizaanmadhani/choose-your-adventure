@@ -43,21 +43,23 @@ const useStyles = makeStyles((theme) => ({
 function ProcessStory(story) {
     const classes = useStyles();
     return (
-        <GridListTile className={classes.tileWrapper}>
-            <img clasName={classes.tileImage} width='400px' src={defaultImg} alt={story.id} />
+        <GridListTile cols={3} className={classes.tileWrapper}>
+            <img className={classes.tileImage} width='400px' src={defaultImg} alt={story.title} />
             <GridListTileBar 
-                title={<span>{story.id}</span>}
+                title={<span>{story.title}</span>}
                 subtitle={<span>by: {story.author}</span>}
                 actionIcon={
                     <Container>
-                        <IconButton onclick={() => {
-
+                        <IconButton onClick={(e) => {
+                            e.preventDefault();
+                            window.location.href=`/read/${story.id}`;
                         }} aria-label={`read ${story.id}`} className={classes.iconWrapper}>
                             <img width='40px' className={classes.icon} src={read} alt='read' />
                         </IconButton>
-                        <IconButton onclick={() => {
-
-                        }}aria-label={`write ${story.id}`} className={classes.iconWrapper}>
+                        <IconButton onClick={(e) => {
+                            e.preventDefault();
+                            window.location.href=`/edit/${story.id}`;
+                        }} aria-label={`write ${story.id}`} className={classes.iconWrapper}>
                             <img width='40px' className={classes.icon} src={write} alt='write' />
                         </IconButton>
                     </Container>

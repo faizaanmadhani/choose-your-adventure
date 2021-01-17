@@ -78,7 +78,8 @@ function processNode (node) {
 }
 
 //AXIOS: get request for story content 
-function ReaderView() {
+//pass page id as prop
+function ReaderView(props) {
 	const classes = useStyles();
 	let nodes = fetchNodes();
 	let jsxNodes = nodes.map(processNode);
