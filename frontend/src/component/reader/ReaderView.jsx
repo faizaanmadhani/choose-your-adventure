@@ -6,6 +6,7 @@ import { Container } from '@material-ui/core'
 import { Button } from '@material-ui/core'
 import homeIcon from "../../assets/white-home.svg"
 import logo from "../../assets/storyPlusPlus.png"
+import { useLocation } from 'react-router';
 
 //http service
 import http from '../../services/httpservice.js'
@@ -83,27 +84,22 @@ function processNode (node) {
 //AXIOS: get request for story content 
 //pass page id as prop
 function ReaderView(props) {
-
 	//set ids
-	const id = props.location.state.id
-	console.log(id); //id successfully parsed
+	const thisId = props.location.state.id
+	console.log(thisId); //id successfully parsed
 
 	const [story, SetStory] = useState([]);
 
-	const useMountEffect = () => useEffect(()=>{
+	useEffect(()=>{
 		//GetStory request
 		const getStory = async(id) => {
-			//console.log(`http://localhost:8080/story/${id}`);
-			//'localhost:8080/story/_bizxm6h2u'
-			const res = await http.get('localhost:8080/story/_bizxm6h2u');
+			const res = await http.get(`http://localhost:8080/story/${id}`);
 				console.log('setting story');
 				console.log(res.data.story);
 			SetStory(res.data.story);
 		}
-        getStory(id);
-	}, [id]);
-
-	useMountEffect();
+        getStory(thisId);
+	}, []);
 
 	console.log(story);
 
@@ -112,8 +108,13 @@ function ReaderView(props) {
 		return(choice.id === 'config')});
 	console.log(config);
 
+	const parent = story.find((choice) => {
+		return(choice.id === config.parent)
+	})
+	console.log(parent);
+
 	const classes = useStyles();
-	let nodes = fetchNodes();
+	let nodes = story.filter((choice) => {return(choice.id != 'config' && choice.id != parent.id)}).map((thisChoice) => {return(thisChoice.choice)});
 	let jsxNodes = nodes.map(processNode);
 	
 	return (
@@ -123,7 +124,7 @@ function ReaderView(props) {
 						<img style={{margin: 'auto', width: '100px', padding: '15px'}} src={logo} alt='LOGO GOES HERE' />
 					</Grid>
                     <Grid className={classes.grid} style={{paddingTop: '1rem', paddingBottom: '1rem' }}container item sm={8}>
-                        <h2 style={{margin: 'auto'}} className={classes.storyTitle} >The Communist Manifesto</h2>
+                        <h2 style={{margin: 'auto'}} className={classes.storyTitle} >{config.title}</h2>
                     </Grid>
                     <Grid className={classes.grid} container item sm={2}>
 						<IconButton style={{margin: 'auto'}} aria-label="home" color="primary"  
@@ -137,11 +138,26 @@ function ReaderView(props) {
                 </Grid> 
                 <Grid className={classes.mainContentWrapper} container item sm={12} spacing={0}>
 					<Container style={{paddingBottom: '2rem'}} className={classes.grid} maxWidth="lg">
-						<h1 className={classes.chapterTitle} style={{margin: 'auto'}}>Chapter 1</h1>
+						<h1 className={classes.chapterTitle} style={{margin: 'auto'}}>Current Chapter</h1>
 					</Container>
 					
 					<Container className={classes.mainContent} maxWidth="lg">
-						<p>
+						{parent.content}
+					</Container>
+                </Grid> 
+                <Grid className={classes.footer} container item sm={12} spacing={0}>
+					{jsxNodes}
+                </Grid> 
+        </Grid>
+	)
+}
+
+export default ReaderView
+
+/*
+
+Test data:
+<p>
 						The Communist League, an international association of workers, which could of course be only a secret one, under conditions obtaining at the time, commissioned us, the undersigned, at the Congress held in London in November 1847, to write for publication a detailed theoretical and practical programme for the Party. Such was the origin of the following Manifesto, the manuscript of which travelled to London to be printed a few weeks before the February [French] Revolution [in 1848]. First published in German, it has been republished in that language in at least twelve different editions in Germany, England, and America. It was published in English for the first time in 1850 in the Red Republican, London, translated by Miss Helen Macfarlane, and in 1871 in at least three different translations in America. The french version first appeared in Paris shortly before the June insurrection of 1848, and recently in Le Socialiste of New York. A new translation is in the course of preparation. A Polish version appeared in London shortly after it was first published in Germany. A Russian translation was published in Geneva in the sixties [A]. Into Danish, too, it was translated shortly after its appearance.
 
 However much that state of things may have altered during the last twenty-five years, the general principles laid down in the Manifesto are, on the whole, as correct today as ever. Here and there, some detail might be improved. The practical application of the principles will depend, as the Manifesto itself states, everywhere and at all times, on the historical conditions for the time being existing, and, for that reason, no special stress is laid on the revolutionary measures proposed at the end of Section II. That passage would, in many respects, be very differently worded today. In view of the gigantic strides of Modern Industry since 1848, and of the accompanying improved and extended organization of the working class, in view of the practical experience gained, first in the February Revolution, and then, still more, in the Paris Commune, where the proletariat for the first time held political power for two whole months, this programme has in some details been antiquated. One thing especially was proved by the Commune, viz., that “the working class cannot simply lay hold of the ready-made state machinery, and wield it for its own purposes.” (See The Civil War in France: Address of the General Council of the International Working Men’ s Association, 1871, where this point is further developed.) Further, it is self-evident that the criticism of socialist literature is deficient in relation to the present time, because it comes down only to 1847; also that the remarks on the relation of the Communists to the various opposition parties (Section IV), although, in principle still correct, yet in practice are antiquated, because the political situation has been entirely changed, and the progress of history has swept from off the earth the greater portion of the political parties there enumerated.
@@ -161,13 +177,5 @@ The Communist Manifesto had, as its object, the proclamation of the inevitable i
 
 The only answer to that possible today is this: If the Russian Revolution becomes the signal for a proletarian revolution in the West, so that both complement each other, the present Russian common ownership of land may serve as the starting point for a communist development.
 						</p>
-					</Container>
-                </Grid> 
-                <Grid className={classes.footer} container item sm={12} spacing={0}>
-					{jsxNodes}
-                </Grid> 
-        </Grid>
-	)
-}
 
-export default ReaderView
+*/

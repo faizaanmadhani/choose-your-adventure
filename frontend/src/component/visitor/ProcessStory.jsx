@@ -54,7 +54,7 @@ function ProcessStory(story) {
                         <Link to={{
                             pathname: `/read/${story.id}`,
                             state: {
-                                id: story.id,
+                                id: story.id
                             }
                             }}>
                         <IconButton aria-label={`read ${story.id}`} className={classes.iconWrapper}>
@@ -64,7 +64,7 @@ function ProcessStory(story) {
                         <Link to={{
                             pathname: `/edit/${story.id}`,
                             state: {
-                                id: story.id,
+                                id: story.id
                             }
                             }}
                         >
