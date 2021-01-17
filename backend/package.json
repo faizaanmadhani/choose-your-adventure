@@ -10,7 +10,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/firestore": "^4.8.1",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
     "escape-html": "^1.0.3",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "firebase-admin": "^9.4.2",
+    "helmet": "^4.3.1"
   }
 }
