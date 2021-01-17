@@ -40,53 +40,16 @@ class WriterView extends Component {
 					data: { label: elem.choice },
 					sourcePosition: 'left',
 					targetPosition: 'right',
-					position: { x: elem.x, y: elem.y }
+					position: { x: elem.position.x, y: elem.position.y }
 				};
 				return tmp;
 			}
 		});
 
-		console.log(story);
-		console.log(nodes);
-
 		this.setState({
 			//set title and set parentid!//!
 			// later to be replaced from backend
-			nodes: [
-				{
-					id: '1',
-					type: 'output', // input node
-					data: { label: '1' },
-					sourcePosition: 'left',
-					targetPosition: 'right',
-					position: { x: 0, y: 300 }
-				},
-				// default node
-				{
-					id: '2',
-					// you can also pass a React component as a label
-					data: { label: '2' },
-					sourcePosition: 'left',
-					targetPosition: 'right',
-					position: { x: 300, y: 300 }
-				},
-				{
-					id: '3',
-					// you can also pass a React component as a label
-					data: { label: '3' },
-					sourcePosition: 'left',
-					targetPosition: 'right',
-					position: { x: 300, y: 425 }
-				},
-				{
-					id: '4',
-					type: 'default', // output node
-					data: { label: '4' },
-					sourcePosition: 'left',
-					targetPosition: 'right',
-					position: { x: 350, y: 550 }
-				}
-			]
+			nodes
 		});
 	}
 	updateStory = (obj) => {
