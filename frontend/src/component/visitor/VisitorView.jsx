@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Grid } from '@material-ui/core'
 import { IconButton } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
@@ -17,6 +17,9 @@ import defaultImg from '../../assets/defaultImg.jpg'
 import './VisitorView.scss'
 
 import search from '../../assets/search.svg'
+
+//http service
+import http from '../../services/httpservice.js'
 
 const useStyles = makeStyles((theme) => ({
  logoWrapper: {
@@ -81,10 +84,34 @@ function mapStory (story) {
 }
 
 function VisitorView() {
-    const classes = useStyles();
+    //test endpoints:
+    //getStories();
+    const [stories2, setStories2] = useState(null); //state
+    const classes = useStyles(); //styles
+    
+    //GetStories request
+    const getStories = async() => {
+        const res = await http.get('http://localhost:3002/');
+        setStories2(res.data.stories);
+        
+    }
+
+    //get stories on mount
+    useEffect(()=>{
+        getStories();
+    }, []);
+    
+    console.log(stories2); //setStories is working.
     let stories = fetchStories();
     let jsxStories = stories.map(mapStory);
-
+    
+    /*
+    useEffect(() => {
+        // Update the document title using the browser API
+        document.title = `You clicked ${count} times`;
+    });
+    */
+    
     return (
         <Grid>
             <Grid style={{backgroundColor: '#292c2e' }}container spacing={0}>
