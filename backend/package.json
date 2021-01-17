@@ -12,6 +12,7 @@
   "dependencies": {
     "@google-cloud/firestore": "^4.8.1",
     "escape-html": "^1.0.3",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "firebase-admin": "^9.4.2"
   }
 }
