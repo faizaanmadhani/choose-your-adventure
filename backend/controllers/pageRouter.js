@@ -88,6 +88,7 @@ pageRouter.post('/create', async (req, res) => {
 	}
 });
 
+// Get all the nodes in a story
 pageRouter.get('/:titleID', async (req, res) => {
 	const storyTitleID = req.params['titleID'];
 
@@ -285,6 +286,38 @@ pageRouter.post('/delete/:title/:docID', async (req, res) => {
 		console.log(e);
 		res.status(500).send({ msg: e.toString() });
 	}
+});
+
+pageRouter.post('/delete_conn/:title', async (req, res) => {
+    const titleID = req.params["title"]
+    if (titleID === undefined) {
+        res.status(500).send({ msg: 'Title not sent' });
+    }
+
+    const parent = req.body.parent
+    const child = req.body.child
+
+    if (parent === undefined || child === undefined) {
+        res.send(500).send({ msg: "You didn't send a parent or a child id"})
+    }
+
+        try {
+
+        const storyPages = await storiesReference.collection(titleID).get();
+        storyPages.docs.forEach(async (node) => {
+            if (node.id === parent ) {
+                const removeLinkRes = await storiesReference.collection(titleID).doc(node.id).update({
+                    links: admin.firestore.FieldValue.arrayRemove(child)
+                });
+            }
+        });
+
+        res.status(200).send({ msg: 'Link deleted successfully' });
+    } catch (e) {
+        console.log(e);
+		res.status(500).send({ msg: e.toString() });
+    }
+ 
 });
 
 module.exports = pageRouter;
