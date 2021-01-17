@@ -18,14 +18,7 @@ class writerPage extends Component {
 							this.props.history.push('/');
 						}}
 					>
-						Back
-					</Button>
-					<Button
-						onClick={() => {
-							this.state.viewRef.current.handleNewStory();
-						}}
-					>
-						create story
+						Back to Main
 					</Button>
 					<Button
 						onClick={() => {
@@ -39,6 +32,17 @@ class writerPage extends Component {
 				<div className="share">
 					<Button variant="contained" color="primary">
 						<p>Share me</p>
+					</Button>
+				</div>
+				<div className="saveB">
+					<Button
+						onClick={() => {
+							this.state.viewRef.current.save();
+						}}
+						variant="contained"
+						color="primary"
+					>
+						<p>Save Work</p>
 					</Button>
 				</div>
 			</div>

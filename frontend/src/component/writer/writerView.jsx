@@ -13,14 +13,26 @@ class WriterView extends Component {
 		instanceWrap: React.createRef(),
 		instance: {},
 		nodeView: -1, //if -1, we are on overview, if on anything else, we are on the nodeview,
-		nodeViewTitle: '',
 		nodeViewValue: ''
+	};
+	getStoryId = () => {
+		return this.state.storyId;
 	};
 	handleNodeViewValueChange = (param) => {
 		this.setState({ nodeViewValue: param });
 	};
 	handleNodeTitleChange = (param) => {
-		this.setState({ nodeViewTitle: param.target.value });
+		const node = this.state.nodes.find((elem) => {
+			return elem.id == this.state.nodeView;
+		});
+		this.setState({
+			nodes: [
+				...this.state.nodes.filter((elem) => {
+					return elem.id != this.state.nodeView;
+				}),
+				{ ...node, data: { label: param.target.value } }
+			]
+		});
 	};
 	async componentDidMount() {
 		this.state.storyId = this.props.storyId;
@@ -68,15 +80,46 @@ class WriterView extends Component {
 			nodes: [ ...nodes1 ]
 		});
 	}
-	updateStory = (obj) => {
-		//! const res = http.post('url', obj);
-		console.log(obj);
+	pageDetailMount = async (id) => {
+		console.log(this.state.nodeView);
+		const { data: { story } } = await http.get(`${backendURL}story/${this.state.storyId}`);
+		const node = story.find((elem) => {
+			return elem.id == this.state.nodeView;
+		});
+		this.setState({ nodeViewValue: node.content });
+	};
+	saveNode = async (node) => {
+		if (node.id == 'config') {
+			const tmp = {};
+		} else {
+			const tmp = {
+				position: node.position
+			};
+			this.state.nodeView != -1 ? (tmp.choice = node.data.label) : console.log('no need to update title');
+			console.log(this.state.nodeViewValue);
+			this.state.nodeViewValue != '' && this.state.nodeView == node.id
+				? (tmp.content = this.state.nodeViewValue)
+				: console.log('no need to update value');
+			http.post(`${backendURL}story/update/${this.state.storyId}/${node.id}`, tmp);
+		}
+	};
+	save = async () => {
+		this.state.nodes.map((elem) => {
+			if (!elem.target) {
+				//if not edge
+				this.saveNode(elem);
+			}
+		});
+	};
+	handleConnectHelper = async (parentId, childId) => {
+		const tmp = { parent: parentId, child: childId };
+		console.log(tmp);
+		http.post(`${backendURL}story/connect/${this.state.storyId}`, tmp);
 	};
 	handleConnect = (param) => {
 		//target is parent, source is child
-		//handleConnect func
 		param.arrowHeadType = 'arrowclosed';
-		//param.animated = 'true';
+		this.handleConnectHelper(param.target, param.source);
 		const nodes = addEdge(param, this.state.nodes);
 
 		console.log(`${param.target} is now parent of ${param.source}`);
@@ -85,28 +128,25 @@ class WriterView extends Component {
 	handleDeleteHelper = async (id) => {
 		await http.post(`${backendURL}story/delete/${this.state.storyId}/${id}`);
 	};
+	handleRemoveLink = async (parent, child) => {
+		await http.post(`${backendURL}story/delete_conn/${this.state.storyId}`, { parent, child });
+	};
 	handleDelete = (param) => {
 		//remove if its not parent
 
 		if (param[0].id != this.state.parentId) {
 			//! or whereever the things start{}
-			this.handleDeleteHelper(param[0].id);
+			if (!param[0].source) {
+				this.handleDeleteHelper(param[0].id);
+			} else {
+				this.handleRemoveLink(param[0].target, param[0].source);
+			}
 			const nodes = removeElements(param, this.state.nodes);
 			this.setState({ nodes });
 		}
 	};
 	handleLoad = async (param) => {
 		this.setState({ instance: param }); //set state instance
-	};
-	handleNewStory = async () => {
-		//!save first, wipe state.
-
-		const data = await http.post('http://localhost:3002/story/create', {
-			title: 'titletest',
-			author: 'authortest'
-		});
-		// const data1 = await http.get('http://localhost:3002/story');
-		// console.log(data1);
 	};
 	handleNewHelper = async (position) => {
 		const tmp = {
@@ -149,10 +189,14 @@ class WriterView extends Component {
 			<div className="flowWrapper" ref={this.state.instanceWrap}>
 				{this.state.nodeView == -1 ? (
 					<ReactFlow
-						onNodeDragStop={(p1, p2) => {
-							console.log(p1);
-							console.log(p2);
-							//! storyupdate here!
+						onNodeDragStop={(p1, node) => {
+							const nodes = [
+								...this.state.nodes.filter((elem) => {
+									return elem.id != node.id;
+								}),
+								node
+							];
+							this.setState({ nodes });
 						}}
 						onMoveEnd={(param) => {
 							console.log(this.state);
@@ -166,7 +210,11 @@ class WriterView extends Component {
 						onConnect={this.handleConnect}
 						onElementsRemove={this.handleDelete}
 						onElementClick={(e, node) => {
-							this.setState({ nodeView: node.id });
+							if (!node.source) {
+								//if not edge
+								this.pageDetailMount(node.id);
+								this.setState({ nodeView: node.id });
+							}
 						}}
 					/>
 				) : (
@@ -174,12 +222,15 @@ class WriterView extends Component {
 						nodeId={this.state.nodeView}
 						value={this.state.nodeViewValue}
 						setValue={this.handleNodeViewValueChange}
-						title={this.state.nodeViewTitle}
+						titleValue={
+							this.state.nodes.find((elem) => {
+								return elem.id == this.state.nodeView;
+							}).data.label
+						}
 						setTitle={this.handleNodeTitleChange}
 						moveBack={() => {
-							this.setState({ nodeView: -1 });
+							this.setState({ nodeView: -1, nodeViewValue: '' });
 						}}
-						// doSave={}
 					/>
 				)}
 			</div>
