@@ -10,9 +10,23 @@ class writerPage extends Component {
 	render() {
 		return (
 			<div className="pageContainer">
-				<WriterView ref={this.state.viewRef} />
+				<WriterView storyId={this.props.match.params.id} ref={this.state.viewRef} />
 				<div className="sideBarContainer">
-					<Button>create story</Button>
+					<Button
+						onClick={() => {
+							//this.state.viewRef.current.save();
+							this.props.history.push('/');
+						}}
+					>
+						Back
+					</Button>
+					<Button
+						onClick={() => {
+							this.state.viewRef.current.handleNewStory();
+						}}
+					>
+						create story
+					</Button>
 					<Button
 						onClick={() => {
 							this.state.viewRef.current.handleNew();

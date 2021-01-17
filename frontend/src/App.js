@@ -1,6 +1,6 @@
 import { Switch, Route } from 'react-router-dom';
 import VisitorView from './component/visitor/VisitorView';
-import writerPage from './component/writer/writerPage';
+import WriterPage from './component/writer/writerPage';
 import ReaderView from './component/reader/ReaderView.jsx';
 
 /*
@@ -14,7 +14,12 @@ function App() {
 		<div className="App">
 			<Switch>
 				<Route path="/read/:id" component={ReaderView} />
-				<Route path="/edit/:id" component={writerPage} />
+				<Route
+					path="/edit/:id"
+					render={(props) => {
+						return <WriterPage {...props} />;
+					}}
+				/>
 				<Route exact path="/" component={VisitorView} />
 			</Switch>
 		</div>

@@ -3,12 +3,12 @@ import React, { Component } from 'react';
 import ReactFlow, { addEdge, removeElements } from 'react-flow-renderer';
 import http from '../../services/httpservice';
 import PageDetail from './pageDetail';
+import { backendURL } from '../../config.json';
 class WriterView extends Component {
 	state = {
 		nodes: [],
 		title: '',
 		storyId: 0,
-		storyID: 0,
 		instanceWrap: React.createRef(),
 		instance: {},
 		nodeView: -1, //if -1, we are on overview, if on anything else, we are on the nodeview,
@@ -21,11 +21,34 @@ class WriterView extends Component {
 	handleNodeTitleChange = (param) => {
 		this.setState({ nodeViewTitle: param.target.value });
 	};
-	componentDidMount() {
-		/*
-		const {arrayBody} = http.get('url' and storyid);
-		const nodes = arrayBody.filter(()=>{}) //filtr out the config doc
-		*/
+	async componentDidMount() {
+		this.state.storyId = this.props.storyId;
+		const { data: { story } } = await http.get(`${backendURL}story/${this.state.storyId}`);
+		const config = story.filter((elem) => {
+			return elem.id == 'config';
+		});
+		const pages = story.filter((elem) => {
+			return elem.id != 'config';
+		});
+		const parentNodeId = config[0].parent;
+		const nodes = pages.map((elem) => {
+			if (elem.id != 'config') {
+				//not a config node
+				const tmp = {
+					id: elem.id,
+					type: elem.id == parentNodeId ? 'output' : 'default',
+					data: { label: elem.choice },
+					sourcePosition: 'left',
+					targetPosition: 'right',
+					position: { x: elem.x, y: elem.y }
+				};
+				return tmp;
+			}
+		});
+
+		console.log(story);
+		console.log(nodes);
+
 		this.setState({
 			//set title and set parentid!//!
 			// later to be replaced from backend
@@ -88,8 +111,18 @@ class WriterView extends Component {
 			this.setState({ nodes });
 		}
 	};
-	handleLoad = (param) => {
+	handleLoad = async (param) => {
 		this.setState({ instance: param }); //set state instance
+	};
+	handleNewStory = async () => {
+		//!save first, wipe state.
+
+		const data = await http.post('http://localhost:3002/story/create', {
+			title: 'titletest',
+			author: 'authortest'
+		});
+		// const data1 = await http.get('http://localhost:3002/story');
+		// console.log(data1);
 	};
 	handleNew = () => {
 		//make new node
