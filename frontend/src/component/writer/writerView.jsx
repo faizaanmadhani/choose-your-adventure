@@ -9,6 +9,7 @@ class WriterView extends Component {
 		nodes: [],
 		title: '',
 		storyId: 0,
+		parentId: 0,
 		instanceWrap: React.createRef(),
 		instance: {},
 		nodeView: -1, //if -1, we are on overview, if on anything else, we are on the nodeview,
@@ -31,7 +32,8 @@ class WriterView extends Component {
 			return elem.id != 'config';
 		});
 		const parentNodeId = config[0].parent;
-		const nodes = pages.map((elem) => {
+		const nodes1 = pages.map((elem) => {
+			//generate the nodes
 			if (elem.id != 'config') {
 				//not a config node
 				const tmp = {
@@ -45,11 +47,25 @@ class WriterView extends Component {
 				return tmp;
 			}
 		});
+		pages.map((elem) => {
+			//generate the links
+			if (elem.links) {
+				elem.links.map((childId) => {
+					nodes1.push({
+						arrowHeadType: 'arrowclosed',
+						id: `reactflow__edge-${childId}-${elem.id}`,
+						source: childId,
+						sourceHandle: null,
+						target: elem.id,
+						targetHandle: null
+					});
+				});
+			}
+		});
 
 		this.setState({
-			//set title and set parentid!//!
-			// later to be replaced from backend
-			nodes
+			parentId: parentNodeId,
+			nodes: [ ...nodes1 ]
 		});
 	}
 	updateStory = (obj) => {
@@ -66,10 +82,15 @@ class WriterView extends Component {
 		console.log(`${param.target} is now parent of ${param.source}`);
 		this.setState({ nodes });
 	};
+	handleDeleteHelper = async (id) => {
+		await http.post(`${backendURL}story/delete/${this.state.storyId}/${id}`);
+	};
 	handleDelete = (param) => {
 		//remove if its not parent
-		if (param[0].id != 1) {
+
+		if (param[0].id != this.state.parentId) {
 			//! or whereever the things start{}
+			this.handleDeleteHelper(param[0].id);
 			const nodes = removeElements(param, this.state.nodes);
 			this.setState({ nodes });
 		}
@@ -87,6 +108,26 @@ class WriterView extends Component {
 		// const data1 = await http.get('http://localhost:3002/story');
 		// console.log(data1);
 	};
+	handleNewHelper = async (position) => {
+		const tmp = {
+			choice: 'new',
+			position,
+			content: ''
+		};
+		const { data } = await http.post(`${backendURL}story/add/${this.state.storyId}`, tmp);
+		const nodes = [
+			{
+				id: data.id,
+				type: 'default',
+				position,
+				sourcePosition: 'left',
+				targetPosition: 'right',
+				data: { label: 'new' }
+			},
+			...this.state.nodes
+		];
+		this.setState({ nodes });
+	};
 	handleNew = () => {
 		//make new node
 		const height = this.state.instanceWrap.current.clientHeight;
@@ -97,18 +138,11 @@ class WriterView extends Component {
 			x: -1 * (1 / toObject.zoom) * instanceObject[0] + width / 2,
 			y: -1 * (1 / toObject.zoom) * instanceObject[1] + height / 2
 		};
-		const nodes = [
-			{
-				id: `${this.state.nodes.length + 1}`,
-				type: 'default',
-				position,
-				sourcePosition: 'left',
-				targetPosition: 'right',
-				data: { label: 'new' }
-			},
-			...this.state.nodes
-		];
-		this.setState({ nodes });
+		this.handleNewHelper(position);
+	};
+	quickTest = async () => {
+		const { data: { story: all } } = await http.get(`${backendURL}story/${this.state.storyId}`);
+		console.log(all);
 	};
 	render() {
 		return (
@@ -121,7 +155,10 @@ class WriterView extends Component {
 							//! storyupdate here!
 						}}
 						onMoveEnd={(param) => {
+							console.log(this.state);
+							this.quickTest();
 							console.log(`window zoom: ${param.zoom}, position: x: ${param.x}, y: ${param.y}`);
+
 							//!storyupdate here!
 						}}
 						onLoad={this.handleLoad}
