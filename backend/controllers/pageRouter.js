@@ -215,7 +215,7 @@ pageRouter.post('/add/:title', async (req, res) => {
 			content: req.body.content !== undefined ? req.body.content : '',
 			links: req.body.links !== undefined ? req.body.links : []
 		});
-		res.status(200).send({ msg: 'New Node Created Successfully' });
+		res.status(200).send({ msg: 'New Node Created Successfully', "id" : ref.id });
 	} catch (e) {
 		res.status(500).send({ msg: e });
 	}
