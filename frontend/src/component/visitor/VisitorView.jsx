@@ -67,7 +67,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 //AXIOS: on page load, send a get request for all story objects and store it.
-function fetchStories () {
+function fetchTestStories () {
 	//Temporary
     return [{id: 'The Communist Manifesto', author: 'Karl Marx'},
             {id: 'Harry Potter', author: 'J.K. Rowling'},
@@ -86,23 +86,23 @@ function mapStory (story) {
 function VisitorView() {
     //test endpoints:
     //getStories();
-    const [stories2, setStories2] = useState(null); //state
+    const [ids, setIds] = useState(null); //
+    
     const classes = useStyles(); //styles
     
     //GetStories request
-    const getStories = async() => {
+    const getIds = async() => {
         const res = await http.get('http://localhost:3002/');
-        setStories2(res.data.stories);
-        
+        setIds(res.data.stories);
     }
 
     //get stories on mount
     useEffect(()=>{
-        getStories();
+        getIds();
     }, []);
     
-    console.log(stories2); //setStories is working.
-    let stories = fetchStories();
+    console.log(ids); //setStories is working.
+    let stories = fetchTestStories();
     let jsxStories = stories.map(mapStory);
     
     /*
