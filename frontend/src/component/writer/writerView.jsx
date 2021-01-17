@@ -7,17 +7,19 @@ class WriterView extends Component {
 	state = {
 		nodes: [],
 		title: '',
+		storyId: 0,
 		storyID: 0,
 		instanceWrap: React.createRef(),
 		instance: {},
 		nodeView: -1, //if -1, we are on overview, if on anything else, we are on the nodeview,
+		nodeViewTitle: '',
 		nodeViewValue: ''
 	};
 	handleNodeViewValueChange = (param) => {
 		this.setState({ nodeViewValue: param });
 	};
-	handleTitleChange = (param) => {
-		this.setState({ title: param.target.value });
+	handleNodeTitleChange = (param) => {
+		this.setState({ nodeViewTitle: param.target.value });
 	};
 	componentDidMount() {
 		/*
@@ -93,11 +95,15 @@ class WriterView extends Component {
 		//make new node
 		const height = this.state.instanceWrap.current.clientHeight;
 		const width = this.state.instanceWrap.current.clientWidth * 0.7;
-		const instanceObject = this.state.instance.toObject().position;
-		const position = { x: instanceObject[0] + width / 2, y: instanceObject[1] + height / 2 };
+		const toObject = this.state.instance.toObject();
+		const instanceObject = toObject.position;
+		const position = {
+			x: -1 * (1 / toObject.zoom) * instanceObject[0] + width / 2,
+			y: -1 * (1 / toObject.zoom) * instanceObject[1] + height / 2
+		};
 		const nodes = [
 			{
-				id: this.state.nodes.length + 1,
+				id: `${this.state.nodes.length + 1}`,
 				type: 'default',
 				position,
 				sourcePosition: 'left',
@@ -135,8 +141,8 @@ class WriterView extends Component {
 						nodeId={this.state.nodeView}
 						value={this.state.nodeViewValue}
 						setValue={this.handleNodeViewValueChange}
-						title={this.state.title}
-						setTitle={this.handleTitleChange}
+						title={this.state.nodeViewTitle}
+						setTitle={this.handleNodeTitleChange}
 						moveBack={() => {
 							this.setState({ nodeView: -1 });
 						}}
