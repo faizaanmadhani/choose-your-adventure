@@ -100,9 +100,9 @@ function fetchTestStories () {
             {id: 'Introduction to JavaScript', author: 'Oracle'}]
 }
 
-function mapStory (story) {
+function mapStory (story, index) {
 	return (
-        <ProcessStory id={story.id} author={story.author} title={story.title}></ProcessStory>
+        <ProcessStory key={index} id={story.id} author={story.author} title={story.title}></ProcessStory>
     );
 }
 

@@ -84,8 +84,6 @@ function processNode (node) {
 //pass page id as prop
 function ReaderView(props) {
 
-	
-	
 	//set ids
 	const id = props.location.state.id
 	console.log(id); //id successfully parsed
