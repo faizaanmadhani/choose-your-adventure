@@ -5,6 +5,13 @@ const db = require('../firestore')
 const pageRouter = express.Router()
 const storiesReference = db.collection('data').doc('stories')
 
+const genTitleHash = () => {
+    // Math.random should be unique because of its seeding algorithm.
+    // Convert it to base 36 (numbers + letters), and grab the first 9 characters
+    // after the decimal.
+    return '_' + Math.random().toString(36).substr(2, 9);
+}
+
 // Pull a field from config node of a test story
 pageRouter.get('/test', async (req, res) => {
     const docRef = await db.collection('test_story').doc('config')
@@ -30,8 +37,7 @@ pageRouter.get('/', async (req, res) => {
     documentRef.listCollections().then(collections => {
         for (let collection of collections) {
           collectionIDs.push({
-            "id" : collection.id, 
-            "info": collection.document('config').data()
+            "id" : collection.id
             })
         }
         res.status(200).send({stories: collectionIDs})
@@ -43,44 +49,62 @@ pageRouter.get('/', async (req, res) => {
 pageRouter.post('/create', async (req, res) => {
 
     // Create collection doc
+    const titleID = genTitleHash()
+
     try {
-        const docRef = await storiesReference.collection(req.name).doc('config').set({
-            title: req.title,
-            author: req.author,
+        const docRef = await storiesReference.collection(titleID).doc('config').set({
+            title: req.body.title,
+            author: req.body.author,
             zoom: 0,
-            position: {"x" : 0, "y" : p}
+            position: {"x" : 0, "y" : 0}
         })
+        const ref = await storiesReference.collection(titleID).add({
+            'choice': '',
+            position: {
+                'x': 0,
+                'y': 0
+            },
+            'content': '',
+                links: []
+            })
+
+        res.status(200).send({"msg": "New story created", "id": titleID, parentNode: ref.id})
+
     } catch (e) {
+        console.log("Error thrown", e)
         res.status(500).send({"msg": e})
     }
 
-    res.status(200).send({"msg": "New story created"})
-
 })
 
-pageRouter.get('/:title', async (req, res) => {
-    const story_title = req.params["title"]
+pageRouter.get('/:titleID', async (req, res) => {
+    const storyTitleID = req.params["titleID"]
+
     try {
-        const storyPages = await storiesReference.collection(story_title).get()
+        const storyPages = await storiesReference.collection(storyTitleID).get()
         const pagesMap = storyPages.docs.map((doc) => doc.data());
         // const configPage = pagesMap.filter(doc => doc.id == 'config')
         // pagesMap = pagesMap.filter(doc => doc.id !== 'config')
         res.status(200).send({"story" : pagesMap})
+
     } catch (e) {
         res.status(500).sendStatus({"msg": e})
     }
 })
 
 // Update story config data
-pageRouter.push('/update/:title', async (req, res) => {
-    const storyTitle = req.params["title"]
-    const configDoc = storiesReference.collection(storyTitle).doc('config')
+pageRouter.post('/update/:titleID', async (req, res) => {
+    const storyTitle = req.params["titleID"]
+    console.log(storyTitle)
+    const configDoc = await storiesReference.collection(storyTitle).doc('config').get()
 
     try {
-        const configObj = await configDoc.get()
-        if (!doc.exists) {
+        //console.log("config doc", configDoc)
+        if (!configDoc.exists) {
             throw Error("Config doc doesn't exist")
         }
+        const configObj = configDoc.data()
+        //console.log(configObj)
 
         // Assigning editable fields
         const title = req.body.title !== null ? req.body.title : configObj.title
@@ -92,9 +116,8 @@ pageRouter.push('/update/:title', async (req, res) => {
         // Securing user-uneditable fields 
         const parent = configObj.parent
         const zoom = configObj.zoom
-
         // Update the doc in firestore
-        const result = await configDoc.set({
+        const result = await storiesReference.collection(storyTitle).doc('config').set({
             'title' : title,
             'author' : author,
             'parent' : parent,
@@ -111,12 +134,12 @@ pageRouter.push('/update/:title', async (req, res) => {
 
     } catch (e) {
         console.error("Error updating story config", e)
-        res.status(500).send({msg: e})
+        res.status(500).send({msg: e.toString()})
     }
 })
 
 // Update page data
-pageRouter.push('/update/:title/:docID', async (req, res) => {
+pageRouter.post('/update/:title/:docID', async (req, res) => {
     const storyTitle = req.params['title']
     const docID = req.params['docID']
 
@@ -162,14 +185,16 @@ pageRouter.push('/update/:title/:docID', async (req, res) => {
 
 })
 
-pageRouter.push('/add/:title', async (req, res) => {
+// Create a new node
+
+pageRouter.post('/add/:title', async (req, res) => {
     const title = req.params["title"]
     if (title == null) {
         res.status(500).send({msg: "Incorrect title sent"})
     }
 
     try {
-        const ref = await storiesReference.collection(title).set({
+        const ref = await storiesReference.collection(title).add({
             'choice': req.body.choice !== null ? req.body.choice : '',
             position: {
                 'x': req.body.position.x !== null ? req.body.position.x : 0,
@@ -185,6 +210,7 @@ pageRouter.push('/add/:title', async (req, res) => {
 
 });
 
+// Connect two nodes
 pageRouter.post('/connect/:title', async (req, res) => {
     const title = req.params["title"]
     if (title == null) {
@@ -218,6 +244,8 @@ pageRouter.post('/connect/:title', async (req, res) => {
     }
 })
 
+// Delete the document
+
 pageRouter.post('/delete/:title/:docID', async (req, res) => {
     const title = req.params['title']
     const docID = req.params['docID']
@@ -229,7 +257,7 @@ pageRouter.post('/delete/:title/:docID', async (req, res) => {
         const deleteRes = await storiesReference.collection(title).doc(docID).delete()
         // Iterate through nodes and find and delete the reference
         const nodes = await storiesReference.collection(title).get()
-        nodes.foreach((node) => {
+        nodes.foreach(async (node) => {
             if (node.links.includes(docID)) {
                 const removeLinkRes = await storiesReference.collection(title).doc(node.id).update({
                     links: firebase.firestore.FieldValue.arrayRemove(docID)
