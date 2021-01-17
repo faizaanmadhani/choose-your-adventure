@@ -5,6 +5,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Container } from '@material-ui/core'
 import { Button } from '@material-ui/core'
 import homeIcon from "../../assets/white-home.svg"
+import logo from "../../assets/storyPlusPlus.png"
 import './ReaderView.scss'
 
 const useStyles = makeStyles({
@@ -51,7 +52,7 @@ const useStyles = makeStyles({
 	}
 });
 
-//AXIOS: on page load, send a get request for ALL nodes and store it.
+//AXIOS: on page load, send a get request for all children nodes and store it.
 function fetchNodes () {
 	//Temporary
 	return ['some chooooiiiiice node1', 'some choiiiiice node2', 'some choiiiiccce node3']
@@ -87,7 +88,7 @@ function ReaderView() {
 		<Grid container spacing={0}>
                 <Grid className={classes.header} container item sm={12} spacing={0}>
 					<Grid className={classes.logo} style={{textAlign: 'center'}}container item sm={2}>
-						<img style={{margin: 'auto'}} src='' alt='LOGO GOES HERE' />
+						<img style={{margin: 'auto', width: '100px', padding: '15px'}} src={logo} alt='LOGO GOES HERE' />
 					</Grid>
                     <Grid className={classes.grid} style={{paddingTop: '1rem', paddingBottom: '1rem' }}container item sm={8}>
                         <h2 style={{margin: 'auto'}} className={classes.storyTitle} >Story Title</h2>
