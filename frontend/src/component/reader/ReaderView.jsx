@@ -51,13 +51,14 @@ const useStyles = makeStyles({
 	}
 });
 
-//API call + parse array of children nodes
+//AXIOS: on page load, send a get request for ALL nodes and store it.
 function fetchNodes () {
 	//Temporary
 	return ['some chooooiiiiice node1', 'some choiiiiice node2', 'some choiiiiccce node3']
 }
 
 //map helper function
+//AXIOS: the onclick event fires a get request for the next page. 
 function processNode (node) {
 	return (
 		<Button style={{
@@ -69,12 +70,13 @@ function processNode (node) {
 			fontWeight: '600',
 			color: '#ffffff',
 			fontSize: '1.05em'
-		}} onClick={() => alert('do something')}>
+		}} onClick={() => alert('do something')}> 
 			{node}
 		</Button>
 	);
 }
 
+//AXIOS: get request for story content 
 function ReaderView() {
 	const classes = useStyles();
 	let nodes = fetchNodes();
@@ -91,14 +93,18 @@ function ReaderView() {
                         <h2 style={{margin: 'auto'}} className={classes.storyTitle} >Story Title</h2>
                     </Grid>
                     <Grid className={classes.grid} container item sm={2}>
-                        <IconButton style={{margin: 'auto'}} aria-label="home" color="primary">
+						<IconButton style={{margin: 'auto'}} aria-label="home" color="primary"  
+							onClick={(e) => {
+                            e.preventDefault();
+                            window.location.href='/';
+                            }} >
                             <img className={classes.homeIcon} style={{margin: 'auto'}} src={homeIcon} alt='home' height='25px' width='25px'/>
                         </IconButton>
                     </Grid>
                 </Grid> 
                 <Grid className={classes.mainContentWrapper} container item sm={12} spacing={0}>
-					<Container maxWidth="lg">
-						<h1 className={classes.chapterTitle}>Chapter $(Depth+1)</h1>
+					<Container style={{paddingBottom: '2rem'}} className={classes.grid} maxWidth="lg">
+						<h1 className={classes.chapterTitle} style={{margin: 'auto'}}>Chapter $(Depth+1)</h1>
 					</Container>
 					
 					<Container className={classes.mainContent} maxWidth="lg">
