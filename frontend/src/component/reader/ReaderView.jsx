@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, useState, useEffect } from 'react'
 import { Grid } from '@material-ui/core'
 import { IconButton } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
@@ -6,6 +6,9 @@ import { Container } from '@material-ui/core'
 import { Button } from '@material-ui/core'
 import homeIcon from "../../assets/white-home.svg"
 import logo from "../../assets/storyPlusPlus.png"
+
+//http service
+import http from '../../services/httpservice.js'
 import './ReaderView.scss'
 
 const useStyles = makeStyles({
@@ -80,6 +83,34 @@ function processNode (node) {
 //AXIOS: get request for story content 
 //pass page id as prop
 function ReaderView(props) {
+	const [id, SetId] = useState('');
+	const [story, SetStory] = useState([]);
+
+	//GetStory request
+	const getStory = async(id) => {
+		console.log(`http://localhost:3002/story/${id}`);
+		const res = await http.get(`http://localhost:3002/story/${id}`);
+		console.log(res.data);
+		//SetStory(res.data.story);
+	}
+
+	
+	useEffect(()=>{
+		SetId(window.location.href.substring(window.location.href.length - 10));
+        getStory(id);
+	}, []);
+
+	console.log(id); //id successfully parsed
+	//console.log(story);
+
+	//this is the config document. 
+	/*
+	const config = story.find((choice) => {
+		return(choice.id === 'config')});
+	console.log(config);
+	*/
+	
+
 	const classes = useStyles();
 	let nodes = fetchNodes();
 	let jsxNodes = nodes.map(processNode);

@@ -116,7 +116,7 @@ function VisitorView() {
     
     //GetStories request
     const getIds = async() => {
-        const res = await http.get('http://localhost:3002/');
+        const res = await http.get('http://localhost:3002/story/');
         setIds(res.data.stories);
     }
 
@@ -128,19 +128,6 @@ function VisitorView() {
     console.log('Ids')
     console.log(ids); //setStories is working.
     let jsxStories = ids.map(mapStory);
-
-    //let stories = fetchTestStories();
-    //let jsxStories = stories.map(mapStory);
-    /* static test data
-    
-    */
-    
-    /*
-    useEffect(() => {
-        // Update the document title using the browser API
-        document.title = `You clicked ${count} times`;
-    });
-    */
     
     return (
         <Grid>
