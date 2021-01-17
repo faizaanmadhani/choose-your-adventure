@@ -116,7 +116,7 @@ function VisitorView() {
     
     //GetStories request
     const getIds = async() => {
-        const res = await http.get('http://localhost:3002/story/');
+        const res = await http.get('http://localhost:8080/story/');
         setIds(res.data.stories);
     }
 

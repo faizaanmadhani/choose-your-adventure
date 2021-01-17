@@ -11,6 +11,7 @@ import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import Avatar from '@material-ui/core/Avatar'
+import { Link } from 'react-router-dom'
 
 import logo from '../../assets/storyPlusPlus.png'
 import defaultImg from '../../assets/defaultImg.jpg'
