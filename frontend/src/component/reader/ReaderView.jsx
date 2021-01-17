@@ -83,7 +83,7 @@ function processNode (node) {
 //AXIOS: get request for story content 
 //pass page id as prop
 function ReaderView(props) {
-	const [id, SetId] = useState('');
+	const id = props.location.state.id
 	const [story, SetStory] = useState([]);
 
 	//GetStory request

@@ -50,18 +50,27 @@ function ProcessStory(story) {
                 subtitle={<span>by: {story.author}</span>}
                 actionIcon={
                     <Container>
-                        <IconButton onClick={(e) => {
-                            e.preventDefault();
-                            window.location.href=`/read/${story.id}`;
-                        }} aria-label={`read ${story.id}`} className={classes.iconWrapper}>
+                        <Link to={{
+                            pathname: `/read/${story.id}`,
+                            state: {
+                                id: story.id,
+                            }
+                            }}>
+                        <IconButton aria-label={`read ${story.id}`} className={classes.iconWrapper}>
                             <img width='40px' className={classes.icon} src={read} alt='read' />
                         </IconButton>
-                        <IconButton onClick={(e) => {
-                            e.preventDefault();
-                            window.location.href=`/edit/${story.id}`;
-                        }} aria-label={`write ${story.id}`} className={classes.iconWrapper}>
+                        </Link>
+                        <Link to={{
+                            pathname: `/edit/${story.id}`,
+                            state: {
+                                id: story.id,
+                            }
+                            }}
+                        >
+                        <IconButton aria-label={`write ${story.id}`} className={classes.iconWrapper}>
                             <img width='40px' className={classes.icon} src={write} alt='write' />
                         </IconButton>
+                        </Link>
                     </Container>
                 }
                 className={classes.tileBar}
