@@ -24,7 +24,7 @@ Here, we store different pages in a story as documents, which are organized into
 - Some members of the team were new to React and Node, so we learned how to use those frameworks.
 - Representing complex data structures in databases, like graphs.
 
-##Challenges we ran into
+## Challenges we ran into
 - Conceptualizing and implementing a graph based data structures in NoSQL
 - Getting GCP to work
 
